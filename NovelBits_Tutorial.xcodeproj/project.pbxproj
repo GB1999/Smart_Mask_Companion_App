@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		796EBEAC2718324E00DAD370 /* MaskPeripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 796EBEAB2718324E00DAD370 /* MaskPeripheral.swift */; };
 		7997BECF270AADB900FCFBE8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7997BECE270AADB900FCFBE8 /* AppDelegate.swift */; };
 		7997BED1270AADB900FCFBE8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7997BED0270AADB900FCFBE8 /* SceneDelegate.swift */; };
 		7997BED3270AADB900FCFBE8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7997BED2270AADB900FCFBE8 /* ViewController.swift */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		796EBEAB2718324E00DAD370 /* MaskPeripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MaskPeripheral.swift; sourceTree = "<group>"; };
 		7997BECB270AADB900FCFBE8 /* NovelBits_Tutorial.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NovelBits_Tutorial.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7997BECE270AADB900FCFBE8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7997BED0270AADB900FCFBE8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -109,6 +111,7 @@
 				7997BEDC270AADBC00FCFBE8 /* LaunchScreen.storyboard */,
 				7997BEDF270AADBC00FCFBE8 /* Info.plist */,
 				7997BED7270AADBA00FCFBE8 /* NovelBits_Tutorial.xcdatamodeld */,
+				796EBEAB2718324E00DAD370 /* MaskPeripheral.swift */,
 			);
 			path = NovelBits_Tutorial;
 			sourceTree = "<group>";
@@ -261,6 +264,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				796EBEAC2718324E00DAD370 /* MaskPeripheral.swift in Sources */,
 				7997BED9270AADBA00FCFBE8 /* NovelBits_Tutorial.xcdatamodeld in Sources */,
 				7997BED3270AADB900FCFBE8 /* ViewController.swift in Sources */,
 				7997BECF270AADB900FCFBE8 /* AppDelegate.swift in Sources */,
