@@ -7,6 +7,22 @@
 
 import UIKit
 import CoreBluetooth
+
+extension String {
+    func image(pointSize: CGFloat = UIFont.systemFontSize) -> UIImage? {
+        let nsString = self as NSString
+        let font = UIFont.systemFont(ofSize: pointSize)
+
+        let size = nsString.size(withAttributes: [.font: font])
+        UIGraphicsBeginImageContextWithOptions(size, false, 0)
+        let rect = CGRect(origin: .zero, size: size)
+        nsString.draw(in: rect, withAttributes: [.font: font])
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
+}
+
 let CharacterUserDescriptionCharacteristicUUID = CBUUID(string: "2901")
 
 class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDelegate{
@@ -19,7 +35,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     @IBOutlet weak var speakerVolumeSlider: UISlider!
     @IBOutlet weak var dictationThresholdSlider: UISlider!
     
+    @IBOutlet weak var languageSelectionButton: UIButton!
+    @IBOutlet weak var languageSelectionMenu: UIMenu!
     @IBOutlet weak var fanToggleSwitch: UISwitch!
+    
     @IBOutlet weak var consoleLabel: UILabel!
     @IBOutlet weak var humidityLabel: UILabel!
     @IBOutlet weak var temperatureLabel: UILabel!
@@ -28,7 +47,35 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
     private var speakerVolume: CBCharacteristic?
     private var fontSize: CBCharacteristic?
     private var fanToggle: CBCharacteristic?
+    private var languageSelection: CBCharacteristic?
     private var savePrintOut: Bool = false
+    
+    let frenchEmoji = "🇫🇷".image()
+    let spanishEmoji = "🇪🇸".image()
+    let englishEmoji = "🇺🇸".image()
+    
+    var demoMenu: UIMenu {
+        return UIMenu(title: "My menu", image: nil, identifier: nil, options: [], children: menuItems)
+    }
+    var menuItems: [UIAction] {
+        return [
+            UIAction(title: "French", image: frenchEmoji, handler: {
+                [unowned self]_ in
+                writeValueToCharacteristic(withCharacteristic: languageSelection!, withValue: Data(Array("fr".utf8)))}),
+            UIAction(title: "Spanish", image: spanishEmoji, handler: {
+                [unowned self]_ in
+                writeValueToCharacteristic(withCharacteristic: languageSelection!, withValue: Data(Array("es".utf8)))}),
+            UIAction(title: "English (default)", image: englishEmoji, handler: {
+                [unowned self]_ in
+                writeValueToCharacteristic(withCharacteristic: languageSelection!, withValue: Data(Array("en".utf8)))}),
+        ]
+    }
+
+    private func setupLanguageSelectionButton(){
+        
+        languageSelectionButton.menu = demoMenu
+        languageSelectionButton.showsMenuAsPrimaryAction = true
+    }
     
     // check hardware status of bluetooth device
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
@@ -114,6 +161,9 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
                 print("Speaker Volume Characteristic Identified")
                 speakerVolume = characteristic
                 speakerVolumeSlider.isEnabled = true
+            case MaskPeripheral.languageSelectionChacteristicUUID:
+                print("Language Selection Characteristic Identified")
+                languageSelection = characteristic
             default:
                 print("\(characteristic.uuid): not recognized")
             }
@@ -137,6 +187,10 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         }
     }
     
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        print("Services Modified")
+    }
+    
     private func humidityConversion(from characteristic: CBCharacteristic) -> String{
         guard let characteristicData = characteristic.value else {return ""}
         let byteArray = [UInt8](characteristicData)
@@ -155,7 +209,7 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         return tempString ?? "TEMP NOT FOUND"
     }
     
-    private func writeFanValueToCharacteristic( withCharacteristic characteristic: CBCharacteristic, withValue value: Data){
+    private func writeValueToCharacteristic( withCharacteristic characteristic: CBCharacteristic, withValue value: Data){
         if  myPeripheral != nil{
             myPeripheral.writeValue(value, for: characteristic, type: .withoutResponse)
         }
@@ -188,19 +242,27 @@ class ViewController: UIViewController, CBCentralManagerDelegate, CBPeripheralDe
         return "\(hour):\(minutes):\(seconds)"
     }
     
+    @IBAction func toggleLanguageSelectionButton(_ sender: Any) {
+        languageSelectionButton.menu = languageSelectionMenu
+        languageSelectionButton.showsMenuAsPrimaryAction = true
+    }
+    
+    
 
     @IBAction func fanToggleChanged(_ sender: Any) {
         let toggleInt:UInt8 = UInt8(fanToggleSwitch.isOn ? 1 : 0)
         print(toggleInt)
-        writeFanValueToCharacteristic(withCharacteristic: fanToggle!, withValue: Data([toggleInt]))
+        writeValueToCharacteristic(withCharacteristic: fanToggle!, withValue: Data([toggleInt]))
     }
+    
     @IBAction func speakerVolumeChanged(_ sender: Any) {
         
         let slider:UInt8 = UInt8(speakerVolumeSlider.value)
-        writeFanValueToCharacteristic(withCharacteristic: speakerVolume!, withValue: Data([slider]))
+        writeValueToCharacteristic(withCharacteristic: speakerVolume!, withValue: Data([slider]))
     }
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupLanguageSelectionButton()
         
         //initialize central Manager
         centralManager = CBCentralManager(delegate: self, queue: nil)
